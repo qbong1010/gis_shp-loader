@@ -1,0 +1,10 @@
+[general]
+name=GIS SHP Loader
+qgisMinimumVersion=3.0
+description=여러 폴더에서 동일한 이름의 shapefile을 로드하는 플러그인
+version=0.1
+author=QGIS User
+email=user@example.com
+about=이 플러그인은 여러 폴더에서 동일한 이름의 shapefile을 자동으로 로드합니다.
+tracker=http://bugs.example.com
+repository=http://repo.example.com 
