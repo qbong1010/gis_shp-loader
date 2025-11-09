@@ -1,10 +1,30 @@
 [general]
 name=GIS SHP Loader
 qgisMinimumVersion=3.0
+qgisMaximumVersion=3.99
 description=여러 폴더에서 동일한 이름의 shapefile을 로드하는 플러그인
-version=0.1
+version=0.1.0
 author=QGIS User
 email=user@example.com
-about=이 플러그인은 여러 폴더에서 동일한 이름의 shapefile을 자동으로 로드합니다.
-tracker=http://bugs.example.com
-repository=http://repo.example.com 
+
+about=이 플러그인은 지정된 이름의 Shapefile을 여러 하위 폴더에서 일괄 로드합니다.
+    대량의 Shapefile을 폴더 구조별로 구성하여 작업할 때 유용합니다.
+    각 레이어는 {폴더명}_{파일명} 형식으로 자동 명명됩니다.
+
+category=Vector
+tags=shapefile,batch,loader,vector,GIS,한국어
+homepage=https://github.com/qbong1010/gis_shp-loader
+tracker=https://github.com/qbong1010/gis_shp-loader/issues
+repository=https://github.com/qbong1010/gis_shp-loader
+icon=icon.png
+
+experimental=False
+deprecated=False
+
+changelog=
+    Version 0.1.0 (2025-11-09)
+    - 초기 릴리스
+    - 배치 Shapefile 로딩 기능
+    - 버전 관리 시스템 구축
+
+    자세한 내용은 CHANGELOG.md 참조 
