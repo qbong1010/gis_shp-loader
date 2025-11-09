@@ -68,7 +68,7 @@ jobs:
           fi
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: GIS SHP Loader v${{ steps.get_version.outputs.VERSION }}
           body: |
@@ -132,3 +132,4 @@ jobs:
   #         # API 키는 GitHub Secrets에 QGIS_PLUGIN_API_KEY로 저장
   #         echo "QGIS 플러그인 저장소 업로드는 수동으로 진행해주세요."
   #         echo "https://plugins.qgis.org/plugins/upload/"
+
