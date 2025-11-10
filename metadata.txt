@@ -4,7 +4,7 @@ qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 description=여러 폴더에서 동일한 이름의 shapefile을 로드하는 플러그인
 version=0.1.0
-author=QGIS User
+author=QBong from DOHWA
 email=user@example.com
 
 about=이 플러그인은 지정된 이름의 Shapefile을 여러 하위 폴더에서 일괄 로드합니다.
