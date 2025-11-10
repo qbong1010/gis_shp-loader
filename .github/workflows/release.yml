@@ -1,0 +1,135 @@
+name: Release QGIS Plugin
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Tag version: $VERSION"
+
+      - name: Verify version in metadata.txt
+        run: |
+          METADATA_VERSION=$(grep -oP 'version=\K[\d.]+' metadata.txt)
+          TAG_VERSION=${{ steps.get_version.outputs.VERSION }}
+          echo "Metadata version: $METADATA_VERSION"
+          echo "Tag version: $TAG_VERSION"
+
+          if [ "$METADATA_VERSION" != "$TAG_VERSION" ]; then
+            echo "❌ Error: Version mismatch!"
+            echo "metadata.txt has version $METADATA_VERSION but tag is v$TAG_VERSION"
+            exit 1
+          fi
+          echo "✓ Version verification passed"
+
+      - name: Package plugin
+        run: |
+          python package.py
+          ls -lh *.zip
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+
+          # CHANGELOG.md에서 이번 버전의 변경사항만 추출
+          if [ -f CHANGELOG.md ]; then
+            # awk를 사용하여 특정 버전 섹션 추출
+            CHANGES=$(awk "/## \[$VERSION\]/,/## \[/" CHANGELOG.md | sed '1d;$d' | head -n -1)
+
+            if [ -z "$CHANGES" ]; then
+              CHANGES="Release version $VERSION"
+            fi
+
+            # 멀티라인 출력을 위한 처리
+            echo "CHANGES<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "CHANGES=Release version $VERSION" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: GIS SHP Loader v${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## GIS SHP Loader v${{ steps.get_version.outputs.VERSION }}
+
+            ${{ steps.changelog.outputs.CHANGES }}
+
+            ---
+
+            ### 설치 방법
+
+            1. **QGIS 플러그인 관리자 (권장)**
+               - QGIS 메뉴: `플러그인` → `플러그인 관리 및 설치`
+               - `ZIP에서 설치` 탭 선택
+               - 다운로드한 ZIP 파일 선택
+
+            2. **수동 설치**
+               - 아래 ZIP 파일 다운로드
+               - QGIS 플러그인 디렉토리에 압축 해제:
+                 - Windows: `%APPDATA%\QGIS\QGIS3\profiles\default\python\plugins`
+                 - Linux: `~/.local/share/QGIS/QGIS3/profiles/default/python/plugins`
+                 - macOS: `~/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins`
+
+            ### 요구사항
+            - QGIS 3.0 이상
+
+            ### 문서
+            - [README](https://github.com/${{ github.repository }}/blob/main/README.md)
+            - [CHANGELOG](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
+
+            ### 버그 리포트 및 기능 요청
+            버그를 발견하거나 새로운 기능을 제안하고 싶으시면 [Issues](https://github.com/${{ github.repository }}/issues)에 등록해주세요.
+          files: |
+            gis_shp_loader.*.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-package
+          path: gis_shp_loader.*.zip
+          retention-days: 90
+
+  # 선택사항: QGIS 공식 플러그인 저장소에 자동 업로드
+  # upload-to-qgis:
+  #   name: Upload to QGIS Plugin Repository
+  #   needs: release
+  #   runs-on: ubuntu-latest
+  #   if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, 'beta')
+  #
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Upload to QGIS.org
+  #       run: |
+  #         # QGIS 플러그인 저장소 API를 사용한 업로드
+  #         # API 키는 GitHub Secrets에 QGIS_PLUGIN_API_KEY로 저장
+  #         echo "QGIS 플러그인 저장소 업로드는 수동으로 진행해주세요."
+  #         echo "https://plugins.qgis.org/plugins/upload/"
+
