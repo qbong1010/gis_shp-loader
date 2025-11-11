@@ -4,6 +4,9 @@
 [![QGIS](https://img.shields.io/badge/QGIS-3.0+-green.svg)](https://qgis.org)
 [![License](https://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
 
+
+![로고](readme_image/qbong.jpg)
+
 도엽별 폴더 내부에 있는 shp 파일을 일일이 업로드해야하는 번거로움을 덜어주는 QGIS용 플러그인입니다. 
 
 ## 브이월드 수치지형도(예시)
